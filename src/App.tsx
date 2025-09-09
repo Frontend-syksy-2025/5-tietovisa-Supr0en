@@ -1,33 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-
+import {useState} from "react";
+import QuizForm from "./QuizForm.tsx";
 function App() {
-  const [count, setCount] = useState(0)
+    type newQuestionType = {
+        question: string,
+        level: string,
+    };
+
+    const [question, setQuestion] = useState('');
+    const [level, setLevel] = useState('easy');
+    const [questions, setQuestions] = useState<newQuestionType>({question: "", level: ""});
+    const [questionList, setQuestionList] = useState<newQuestionType[]>([]);
+    const [isActive, setIsActive] = useState(false);
+    const [randomQuestion, setRandomQuestion] = useState(0);
+
+    function addQuestion() {
+        setQuestions({question, level});
+        setQuestionList([...questionList, questions]);
+        setQuestion("");
+    }
+    function setActive() {
+        setIsActive(true);
+        setRandomQuestion(Math.floor(Math.random() * questionList.length));
+    }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+            <h1>Quiz</h1>
+            <form>
+                <input style={{height:'30px', marginRight: "10px"}} type={"text"} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={"Enter a question"}/>
+                <select style={{height:'37px'}} value={level} onChange={(e) => setLevel(e.target.value)}>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <input style={{height:'37px', marginRight: "10px" }} type={"button"} value={"Add Question"} onClick={addQuestion}/>
+                { questionList.length <= 3 ?
+                    <input style={{height:'37px', marginRight: "10px"}} type={"button"} value={"Start game"} onClick={setActive} disabled={true} /> : <input style={{height:'37px'}} type={"button"} value={"Start game"} onClick={setActive} disabled={false} />
+                }
+                {isActive && <QuizForm input={questionList[randomQuestion]} />}
+
+            </form>
+        </div>
     </>
   )
 }
